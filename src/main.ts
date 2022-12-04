@@ -1,3 +1,8 @@
+import BaseCreep from "Base/Creep";
+import roleHarvester from "roleHarvester";
+import roleUpgrader from "roleUpgrader";
+import roleBuilder from "roleBuilder";
+import roomManager from "roomManager";
 import { ErrorMapper } from "utils/ErrorMapper";
 
 declare global {
@@ -40,4 +45,50 @@ export const loop = ErrorMapper.wrapLoop(() => {
       delete Memory.creeps[name];
     }
   }
+  const harvesters = _.filter(Game.creeps, creep => creep.memory.role == "harvester");
+  console.log("Harvesters: " + harvesters.length);
+  if (harvesters.length < 2) {
+    const newName = "Harvester" + Game.time;
+    console.log("Spawning new harvester: " + newName);
+    Game.spawns["Spawn1"].spawnCreep([WORK, CARRY, MOVE], newName, {
+      memory: { role: "harvester", room: Game.spawns["Spawn1"].room.name, working: false }
+    });
+  }
+
+  const upgraders = _.filter(Game.creeps, creep => creep.memory.role == "upgrader");
+  console.log("Upgraders: " + upgraders.length);
+  if (upgraders.length < 1) {
+    const newName = "Upgrader" + Game.time;
+    console.log("Spawning new upgrader: " + newName);
+    Game.spawns["Spawn1"].spawnCreep([WORK, CARRY, MOVE], newName, {
+      memory: { role: "upgrader", room: Game.spawns["Spawn1"].room.name, working: false }
+    });
+  }
+
+
+
+  const builders = _.filter(Game.creeps, creep => creep.memory.role == "builder");
+  console.log("Builders: " + builders.length);
+  if (builders.length < 3) {
+    const newName = "Builder" + Game.time;
+    console.log("Spawning new builder: " + newName);
+    Game.spawns["Spawn1"].spawnCreep([WORK, CARRY, MOVE], newName, {
+      memory: { role: "builder", room: Game.spawns["Spawn1"].room.name, working: false }
+    });
+
+  }
+
+  for (var name in Game.creeps) {
+    var creep = Game.creeps[name];
+    if (creep.memory.role == "harvester") {
+      roleHarvester.run(creep);
+    }
+    if (creep.memory.role == "upgrader") {
+      roleUpgrader.run(creep);
+    }
+    if (creep.memory.role == "builder") {
+      roleBuilder.run(creep);
+    }
+  }
+  roomManager.buildExtensions(Game.spawns['Spawn1'].room)
 });
