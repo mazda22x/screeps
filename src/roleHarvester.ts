@@ -1,4 +1,5 @@
 export default {
+  
   /** @param {Creep} creep **/
   run: function (creep: Creep) {
     if (creep.store.getFreeCapacity() > 0) {
